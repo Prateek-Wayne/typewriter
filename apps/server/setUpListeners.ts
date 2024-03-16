@@ -22,11 +22,11 @@ export const setUpEventListene = (io: Server) => {
         if (!game) {
           return socket.emit(SocketEvent.ERROR, "Game not Found");
         }
-        game.joinPlayer(socket.id,name,socket);
+        game.joinPlayer(socket.id, name, socket);
       } else {
-        const game=new Game(roomID,io,socket.id);
-        rooms.set(roomID,game);
-        game.joinPlayer(socket.id,name,socket);
+        const game = new Game(roomID, io, socket.id);
+        rooms.set(roomID, game);
+        game.joinPlayer(socket.id, name, socket);
       }
     });
   });
