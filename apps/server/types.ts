@@ -11,6 +11,8 @@ export enum SocketEvent {
     GAMEFINISHED='game-finished',
     SCORE='player-score',
     PLAYERTYPED='player-typed',
+    LEAVE='leave',
+    PLAYERLEFT='player-left',
     // Add more event types as needed
 }
 

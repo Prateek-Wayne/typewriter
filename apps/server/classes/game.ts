@@ -1,6 +1,7 @@
 import { Server, Socket } from "socket.io";
 import { SocketEvent } from "../types";
 import { generateParagraph } from "../utils/generateParagraph";
+import { rooms } from "../setUpListeners";
 
 export class Game {
   gameStatus: "not-started" | "in-progress" | "finished";
@@ -69,6 +70,22 @@ export class Game {
       }
 
       this.io.to(this.gameId).emit(SocketEvent.SCORE, { id: socket.id, score });
+    });
+
+    socket.on(SocketEvent.LEAVE, () => {
+      if (socket.id === this.gameHost) {
+        this.players = this.players.filter((player) => player.id !== socket.id);
+        if (this.players.length !== 0) {
+          this.gameHost = this.players[0].id;
+          this.io.to(this.gameId).emit(SocketEvent.NEWHOST, this.gameHost);
+          this.io.to(this.gameHost).emit(SocketEvent.PLAYERLEFT, socket.id);
+        } else {
+          rooms.delete(this.gameId);
+        }
+      }
+      socket.leave(this.gameId);
+      this.players = this.players.filter((player) => player.id !== socket.id);
+      this.io.to(this.gameId).emit(SocketEvent.PLAYERLEFT, socket.id);
     });
   }
 
