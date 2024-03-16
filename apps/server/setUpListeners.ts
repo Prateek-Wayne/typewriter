@@ -4,7 +4,7 @@ import { Game } from "./classes/game";
 
 export const rooms = new Map<string, Game>();
 
-export const setUpEventListene = (io: Server) => {
+export const setUpListeners = (io: Server) => {
   io.on(SocketEvent.Connected, (socket) => {
     console.log(`New Socket Connection with Socket ID :${socket.id}`);
 
