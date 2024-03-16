@@ -4,8 +4,13 @@ export enum SocketEvent {
     ERROR='error',
     UserJoined = 'user_joined',
     UserLeft = 'user_left',
+    STARTGAME='start-game',
+    GAMESTARTED='game-started',
     AllPlayer='all-player',
-    NEWHOST='new-host'
+    NEWHOST='new-host',
+    GAMEFINISHED='game-finished',
+    SCORE='player-score',
+    PLAYERTYPED='player-typed',
     // Add more event types as needed
 }
 
