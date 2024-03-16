@@ -13,6 +13,7 @@ export enum SocketEvent {
     PLAYERTYPED='player-typed',
     LEAVE='leave',
     PLAYERLEFT='player-left',
+    DISCONNECT='disconnect',
     // Add more event types as needed
 }
 
