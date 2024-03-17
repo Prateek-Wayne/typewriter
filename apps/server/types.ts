@@ -2,11 +2,11 @@ export enum SocketEvent {
     Connected= 'connection',
     JOINGAME = 'join-game',
     ERROR='error',
-    UserJoined = 'user_joined',
+    UserJoined = 'user_joined',//player-joined in main
     UserLeft = 'user_left',
     STARTGAME='start-game',
     GAMESTARTED='game-started',
-    AllPlayer='all-player',
+    AllPlayer='all-player',//players in main
     NEWHOST='new-host',
     GAMEFINISHED='game-finished',
     SCORE='player-score',
