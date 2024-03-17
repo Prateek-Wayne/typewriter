@@ -1,33 +1,33 @@
 import { Server } from "socket.io";
-import { SocketEvent } from "./types";
 import { Game } from "./classes/game";
 
 export const rooms = new Map<string, Game>();
 
-export const setUpListeners = (io: Server) => {
-  io.on(SocketEvent.Connected, (socket) => {
-    console.log(`New Socket Connection with Socket ID :${socket.id}`);
+export function setupListeners(io: Server) {
+  io.on("connection", (socket) => {
+    console.log(`New connection - ${socket.id}`);
 
-    socket.on(SocketEvent.JOINGAME, (roomID: string, name: string) => {
-      if (!roomID) {
-        return socket.emit(SocketEvent.ERROR, "Invalif room ID");
+    socket.on("join-game", (roomId: string, name: string) => {
+      if (!roomId) {
+        return socket.emit("error", "Invalid room ID");
       }
-      if (!name) {
-        return socket.emit(SocketEvent.ERROR, "Please Providee name");
-      }
+      socket.join(roomId);
+      console.log("joined a room");
 
-      socket.join(roomID);
-      if (rooms.has(roomID)) {
-        const game = rooms.get(roomID);
-        if (!game) {
-          return socket.emit(SocketEvent.ERROR, "Game not Found");
-        }
+      // Check if the game already exists
+      if (rooms.has(roomId)) {
+        console.log("room exists");
+        // Add the player to the class instance
+        const game = rooms.get(roomId);
+        if (!game) return socket.emit("error", "Game not found");
         game.joinPlayer(socket.id, name, socket);
       } else {
-        const game = new Game(roomID, io, socket.id);
-        rooms.set(roomID, game);
+        console.log("room doesnt exists");
+        // Create a new game instance
+        const game = new Game(roomId, io, socket.id);
+        rooms.set(roomId, game);
         game.joinPlayer(socket.id, name, socket);
       }
     });
   });
-};
+}

@@ -7,8 +7,6 @@ import { toast } from "sonner";
 import LeaderboardCard from "./leaderboard-card";
 import { Button } from "./ui/button";
 import { Textarea } from "./ui/textarea";
-import {SocketEvent} from '../../server/types';
-
 
 export default function GamePlayer({ gameId, name }: GameProps) {
   const [ioInstance, setIoInstance] = useState<Socket>();
@@ -24,7 +22,7 @@ export default function GamePlayer({ gameId, name }: GameProps) {
     });
     setIoInstance(socket);
 
-    socket.emit(SocketEvent.JOINGAME, gameId, name);
+    socket.emit("join-game", gameId, name);
 
     return () => {
       removeListeners();
@@ -51,20 +49,20 @@ export default function GamePlayer({ gameId, name }: GameProps) {
       console.log("connected");
     });
 
-    ioInstance.on(SocketEvent.AllPlayer, (players: Player[]) => {
+    ioInstance.on("players", (players: Player[]) => {
       console.log("received players");
       setPlayers(players);
     });
 
-    ioInstance.on(SocketEvent.UserJoined, (player: Player) => {
+    ioInstance.on("player-joined", (player: Player) => {
       setPlayers((prev) => [...prev, player]);
     });
 
-    ioInstance.on(SocketEvent.PLAYERLEFT, (id: string) => {
+    ioInstance.on("player-left", (id: string) => {
       setPlayers((prev) => prev.filter((player) => player.id !== id));
     });
 
-    ioInstance.on(SocketEvent.SCORE, ({ id, score }: PlayerScore) => {
+    ioInstance.on("player-score", ({ id, score }: PlayerScore) => {
       setPlayers((prev) =>
         prev.map((player) => {
           if (player.id === id) {
@@ -78,21 +76,21 @@ export default function GamePlayer({ gameId, name }: GameProps) {
       );
     });
 
-    ioInstance.on(SocketEvent.GAMESTARTED, (paragraph: string) => {
+    ioInstance.on("game-started", (paragraph: string) => {
       setParagraph(paragraph);
       setGameStatus("in-progress");
     });
 
-    ioInstance.on(SocketEvent.GAMEFINISHED, () => {
+    ioInstance.on("game-finished", () => {
       setGameStatus("finished");
       setInputParagraph("");
     });
 
-    ioInstance.on(SocketEvent.NEWHOST, (id: string) => {
+    ioInstance.on("new-host", (id: string) => {
       setHost(id);
     });
 
-    ioInstance.on(SocketEvent.ERROR, (message: string) => {
+    ioInstance.on("error", (message: string) => {
       toast.error(message);
     });
   }
@@ -101,25 +99,25 @@ export default function GamePlayer({ gameId, name }: GameProps) {
     if (!ioInstance) return;
 
     ioInstance.off("connect");
-    ioInstance.off(SocketEvent.AllPlayer);
-    ioInstance.off(SocketEvent.UserJoined);
-    ioInstance.off(SocketEvent.PLAYERLEFT);
-    ioInstance.off(SocketEvent.SCORE);
-    ioInstance.off(SocketEvent.GAMESTARTED);
-    ioInstance.off(SocketEvent.GAMEFINISHED);
-    ioInstance.off(SocketEvent.NEWHOST);
-    ioInstance.off(SocketEvent.ERROR);
+    ioInstance.off("players");
+    ioInstance.off("player-joined");
+    ioInstance.off("player-left");
+    ioInstance.off("player-score");
+    ioInstance.off("game-started");
+    ioInstance.off("game-finished");
+    ioInstance.off("new-host");
+    ioInstance.off("error");
   }
 
   function startGame() {
     if (!ioInstance) return;
 
-    ioInstance.emit(SocketEvent.STARTGAME);
+    ioInstance.emit("start-game");
   }
 
   window.onbeforeunload = () => {
     if (ioInstance) {
-      ioInstance.emit(SocketEvent.LEAVE);
+      ioInstance.emit("leave");
     }
   };
 
